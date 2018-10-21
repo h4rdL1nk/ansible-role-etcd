@@ -21,9 +21,9 @@ platforms:
     memory: 512
     cpus: 1
     provider_raw_config_args:
-      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi', '--size', 2 * 1024]"
+      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-1.vdi', '--size', 2 * 1024]"
       - "customize ['storagectl', :id, '--name', 'SATA', '--add', 'sata', '--portcount', 2 ]"
-      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi']"
+      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-1.vdi']"
     groups:
       - etcd-cluster
   - name: instance-2
@@ -33,9 +33,9 @@ platforms:
     memory: 512
     cpus: 1
     provider_raw_config_args:
-      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi', '--size', 2 * 1024]"
+      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-2.vdi', '--size', 2 * 1024]"
       - "customize ['storagectl', :id, '--name', 'SATA', '--add', 'sata', '--portcount', 2 ]"
-      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi']"
+      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-2.vdi']"
     groups:
       - etcd-cluster  
   - name: instance-3
@@ -45,9 +45,9 @@ platforms:
     memory: 512
     cpus: 1
     provider_raw_config_args:
-      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi', '--size', 2 * 1024]"
+      - "customize ['createhd', '--filename', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-3.vdi', '--size', 2 * 1024]"
       - "customize ['storagectl', :id, '--name', 'SATA', '--add', 'sata', '--portcount', 2 ]"
-      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra.vdi']"
+      - "customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '${MOLECULE_EPHEMERAL_DIRECTORY:-/tmp}/extra-3.vdi']"
     groups:
       - etcd-cluster
 
