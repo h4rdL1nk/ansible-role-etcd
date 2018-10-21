@@ -2,3 +2,8 @@
 
 etcd:
   hosts_group: etcd-cluster
+  network:
+    interface: eth1
+  cluster:
+    name: etcd0
+    token: etcd-cluster0

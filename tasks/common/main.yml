@@ -2,4 +2,4 @@
 
 - name: Debug
   debug:
-    msg: "Etcd hosts: {% for node in groups[etcd.hosts_group] %} {{ansible_default_ipv4.address}} {% endfor %}"
+    msg: "Etcd hosts: {% for node in groups[etcd.hosts_group] %} {{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }} {% endfor %}"
