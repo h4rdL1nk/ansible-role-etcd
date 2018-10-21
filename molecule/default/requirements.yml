@@ -1,0 +1,10 @@
+---
+
+- name: ansible-role-linux-base
+  scm: git
+  src: https://github.com/h4rdL1nk/ansible-role-linux-base
+  version: master
+- name: ansible-role-docker-ce
+  scm: git
+  src: https://github.com/h4rdL1nk/ansible-role-docker-ce
+  version: master

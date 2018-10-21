@@ -1,0 +1,4 @@
+---
+
+etcd:
+  hosts_group: etcd-cluster
