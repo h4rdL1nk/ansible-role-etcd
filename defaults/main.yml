@@ -11,4 +11,9 @@ etcd:
     name: etcd0
     token: etcd-cluster0
   data:
-    dir: /data/dockershared/etcd/data
+    dir: 
+      external: /data/dockershared/etcd/data
+      internal: /datadir
+  image:
+    repo: quay.io/coreos/etcd
+    tag: v2.3.8

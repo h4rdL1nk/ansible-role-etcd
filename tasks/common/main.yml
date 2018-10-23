@@ -6,13 +6,12 @@
 - name: Start container
   docker_container:
     name: etcd
-    image: quay.io/coreos/etcd:v2.3.8
+    image: "{{ etcd.image.repo }}:{{ etcd.image.tag }}"
     ports:
-      - "4001:4001"
-      - "2380:2380"
-      - "2379:2379" 
+      - "{{ etcd.network.ports.peers }}:{{ etcd.network.ports.peers }}"
+      - "{{ etcd.network.ports.listen }}:{{ etcd.network.ports.listen }}" 
     volumes:
-      - "{{ etcd.data.dir }}:/datadir:rw,Z"
+      - "{{ etcd.data.dir.external }}:{{ etcd.data.dir.internal }}:rw,Z"
     command: [
         "--name", "{{ ansible_hostname }}",
         "--data-dir","/datadir",
