@@ -4,6 +4,9 @@ etcd:
   hosts_group: etcd-cluster
   network:
     interface: eth1
+    ports:
+      listen: 2379
+      peers: 2380
   cluster:
     name: etcd0
     token: etcd-cluster0
