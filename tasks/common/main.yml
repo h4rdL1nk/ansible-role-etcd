@@ -1,5 +1,25 @@
 ---
 
-- name: Debug
-  debug:
-    msg: "Etcd hosts: {% for node in groups[etcd.hosts_group] %} {{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }} {% endfor %}"
+### Start etcd container as described in official CoreOS docs
+### https://coreos.com/etcd/docs/latest/v2/docker_guide.html
+
+- name: Start container
+  docker_container:
+    name: etcd
+    image: quay.io/coreos/etcd:v2.3.8
+    ports:
+      - "4001:4001"
+      - "2380:2380"
+      - "2379:2379" 
+    volumes:
+      - "{{ etcd.data.dir }}:/datadir:rw,Z"
+    command: [
+        "--name", "{{ ansible_hostname }}",
+        "--data-dir","/datadir",
+        "-advertise-client-urls","http://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:2379,http://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:4001",
+        "-listen-client-urls","http://0.0.0.0:2379,http://0.0.0.0:4001",
+        "-initial-advertise-peer-urls","http://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:2380",
+        "-listen-peer-urls","http://0.0.0.0:2380",
+        "-initial-cluster-token","{{ etcd.cluster.name }}",
+        "-initial-cluster","{% for node in groups[etcd.hosts_group] %}{{ node }}=http://{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:2380{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}"
+    ]

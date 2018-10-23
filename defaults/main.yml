@@ -7,3 +7,5 @@ etcd:
   cluster:
     name: etcd0
     token: etcd-cluster0
+  data:
+    dir: /data/dockershared/etcd/data
