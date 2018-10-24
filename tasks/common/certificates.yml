@@ -1,0 +1,26 @@
+---
+
+- name: Ensure directory exists for local self-signed TLS certs
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ etcd.data.ssl.dir }}"
+    - "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}"
+
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+
+- name: Generate an OpenSSL CSR
+  openssl_csr:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
+    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+    common_name: "{{ ansible_hostname }}"
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/fullchain.pem"
+    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+    csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
+    provider: selfsigned

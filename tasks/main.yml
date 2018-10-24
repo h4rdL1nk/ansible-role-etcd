@@ -1,3 +1,4 @@
 ---
 
-- include_tasks: "common/main.yml"
+- include_tasks: "common/certificates.yml"
+- include_tasks: "common/container.yml"
