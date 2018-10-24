@@ -6,7 +6,55 @@
     state: directory
   with_items:
     - "{{ etcd.data.ssl.dir }}"
+    - "{{ etcd.data.ssl.dir }}/ca"
     - "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}"
+
+- name: Create local certificates directory
+  become: false
+  local_action:
+    module: file
+    state: directory
+    path: certificates/etcd
+    recurse: true
+
+- name: Generate CA private key
+  become: false
+  local_action:
+    module: openssl_privatekey
+    path: certificates/etcd/ca.key
+
+- name: Generate CA CSR
+  become: false
+  local_action:
+    module: openssl_csr
+    state: present
+    path: certificates/etcd/ca.csr
+    privatekey_path: certificates/etcd/ca.key
+    common_name: Ansible
+    country_name: ES
+    state_or_province_name: Madrid
+    locality_name: Madrid
+    email_address: test@somedomain.com
+    organization_name: Organization
+    organizational_unit_name: IT
+
+- name: Generate a Self Signed CA certificate
+  become: false
+  local_action:
+    module: openssl_certificate
+    state: present
+    path: certificates/etcd/ca.pem
+    privatekey_path: certificates/etcd/ca.key
+    csr_path: "certificates/etcd/ca.csr"
+    provider: selfsigned
+
+- name: Copy generated CA files
+  copy: 
+    src: "{{ item }}"
+    dest: "{{ etcd.data.ssl.dir }}/ca"
+  with_items:
+    - certificates/etcd/ca.pem
+    - certificates/etcd/ca.key
 
 - name: Generate an OpenSSL private key
   openssl_privatekey:
@@ -18,9 +66,10 @@
     privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
     common_name: "{{ ansible_hostname }}"
 
-- name: Generate a Self Signed OpenSSL certificate
+- name: Generate an OpenSSL certificate signed with your own CA certificate
   openssl_certificate:
     path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/fullchain.pem"
-    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
     csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
-    provider: selfsigned
+    ownca_path: "{{ etcd.data.ssl.dir }}/ca/ca.pem"
+    ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/privkey.pem"
+    provider: ownca
