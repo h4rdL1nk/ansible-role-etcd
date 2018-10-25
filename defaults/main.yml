@@ -23,6 +23,9 @@ etcd:
         key: ca.key
         cert: ca.pem
         issuer: Custom Issuer
+      transport:
+        key: client-transport.key
+        cert: client-transport.pem
       dir: /data/dockershared/etcd/ssl
   image:
     repo: quay.io/coreos/etcd

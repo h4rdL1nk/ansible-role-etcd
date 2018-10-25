@@ -7,6 +7,7 @@
   with_items:
     - "{{ etcd.data.ssl.dir }}"
     - "{{ etcd.data.ssl.dir }}/ca"
+    - "{{ etcd.data.ssl.dir }}/transport"
     - "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}"
 
 - name: Create local certificates directory
@@ -75,17 +76,17 @@
     - certificates
     - ca
 
-- name: Generate CLIENT private key
+- name: Generate peer certificate private key
   openssl_privatekey:
-    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key"
   tags:
     - certificates
     - client
 
-- name: Generate CLIENT certificate CSR
+- name: Generate peer certificate CSR
   openssl_csr:
-    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
-    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.csr"
+    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key"
     common_name: "{{ ansible_hostname }}"
     subject_alt_name:
       - "IP:{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}"
@@ -101,10 +102,10 @@
     - certificates
     - client
 
-- name: Generate CLIENT certificate
+- name: Generate peer certificate
   openssl_certificate:
-    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/fullchain.pem"
-    csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.pem"
+    csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.csr"
     ownca_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.cert }}"
     ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.key }}"
     provider: ownca
@@ -112,3 +113,53 @@
   tags:
     - certificates
     - client
+
+- name: Generate client transport certificate private key
+  become: false
+  local_action:
+    module: openssl_privatekey
+    path: certificates/etcd/client-transport.key
+  tags:
+    - certificates
+    - transport
+
+- name: Generate client certificate CSR
+  become: false
+  local_action:
+    module: openssl_csr
+    path: certificates/etcd/client-transport.csr
+    privatekey_path: certificates/etcd/client-transport.key
+    common_name: "{{ etcd.cluster.name }}"
+    subject_alt_name: "{{ groups[etcd.hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
+    basic_constraints:
+      - CA:false
+    basic_constraints_critical: true
+    force: false
+  tags:
+    - certificates
+    - transport
+
+- name: Generate peer certificate
+  become: false
+  local_action:
+    module: openssl_certificate
+    path: certificates/etcd/client-transport.pem
+    csr_path: certificates/etcd/client-transport.csr
+    ownca_path: certificates/etcd/ca.pem
+    ownca_privatekey_path: certificates/etcd/ca.key
+    provider: ownca
+    force: false
+  tags:
+    - certificates
+    - transport
+
+- name: Copy generated peer certificate files
+  copy: 
+    src: "{{ item }}"
+    dest: "{{ etcd.data.ssl.dir }}/transport"
+  with_items:
+    - certificates/etcd/client-transport.pem
+    - certificates/etcd/client-transport.key
+  tags:
+    - certificates
+    - ca
