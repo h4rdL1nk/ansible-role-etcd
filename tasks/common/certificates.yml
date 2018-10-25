@@ -5,10 +5,10 @@
     path: "{{ item }}"
     state: directory
   with_items:
-    - "{{ etcd.data.ssl.dir }}"
-    - "{{ etcd.data.ssl.dir }}/ca"
-    - "{{ etcd.data.ssl.dir }}/transport"
-    - "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}"
+    - "{{ etcd_data_ssl_dir }}"
+    - "{{ etcd_data_ssl_dir }}/ca"
+    - "{{ etcd_data_ssl_dir }}/transport"
+    - "{{ etcd_data_ssl_dir }}/{{ ansible_hostname }}"
 
 - name: Create local certificates directory
   become: false

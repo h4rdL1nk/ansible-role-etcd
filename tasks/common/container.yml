@@ -6,31 +6,31 @@
 - name: Start container
   docker_container:
     name: etcd
-    image: "{{ etcd.image.repo }}:{{ etcd.image.tag }}"
+    image: "{{ etcd_image_repo }}:{{ etcd_image_tag }}"
     ports:
-      - "{{ etcd.network.ports.peers }}:{{ etcd.network.ports.peers }}"
-      - "{{ etcd.network.ports.listen }}:{{ etcd.network.ports.listen }}" 
+      - "{{ etcd_network_ports_peers }}:{{ etcd_network_ports_peers }}"
+      - "{{ etcd_network_ports_listen }}:{{ etcd_network_ports_listen }}" 
     volumes:
-      - "{{ etcd.data.dir.external }}:{{ etcd.data.dir.internal }}:rw,Z"
-      - "{{ etcd.data.ssl.dir }}:{{ etcd.data.ssl.internal }}:ro,Z"
+      - "{{ etcd_data_dir_external }}:{{ etcd_data_dir_internal }}:rw,Z"
+      - "{{ etcd_data_ssl_dir }}:{{ etcd_data_ssl_internal }}:ro,Z"
     command: [
         "--name", "{{ ansible_hostname }}",
         "--data-dir","/datadir",
         ##Client listen options
         "--client-cert-auth",
-        "--trusted-ca-file","{{ etcd.data.ssl.internal }}/ca/{{ etcd.data.ssl.ca.cert }}",
-        "--cert-file","{{ etcd.data.ssl.internal }}/transport/{{ etcd.data.ssl.transport.cert }}", 
-        "--key-file","{{ etcd.data.ssl.internal }}/transport/{{ etcd.data.ssl.transport.key }}",
-        "-advertise-client-urls","{{ etcd.network.proto.listen }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.listen }}",
-        "-listen-client-urls","{{ etcd.network.proto.listen }}://0.0.0.0:{{ etcd.network.ports.listen }}", 
-        "-initial-cluster-token","{{ etcd.cluster.name }}",
-        "-initial-cluster","{% for node in groups[etcd.hosts_group] %}{{ node }}={{ etcd.network.proto.peers }}://{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}",
+        "--trusted-ca-file","{{ etcd_data_ssl_internal }}/ca/{{ etcd_data_ssl_ca_cert }}",
+        "--cert-file","{{ etcd_data_ssl_internal }}/transport/{{ etcd_data_ssl_transport_cert }}", 
+        "--key-file","{{ etcd_data_ssl_internal }}/transport/{{ etcd_data_ssl_transport_key }}",
+        "-advertise-client-urls","{{ etcd_network_proto_listen }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}:{{ etcd_network_ports_listen }}",
+        "-listen-client-urls","{{ etcd_network_proto_listen }}://0.0.0.0:{{ etcd_network_ports_listen }}", 
+        "-initial-cluster-token","{{ etcd_cluster_name }}",
+        "-initial-cluster","{% for node in groups[etcd_hosts_group] %}{{ node }}={{ etcd_network_proto_peers }}://{{ hostvars[node]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}:{{ etcd_network_ports_peers }}{% if loop.index < groups[etcd_hosts_group]|length %},{% endif %}{% endfor %}",
         ##Peer listen options
-        "-listen-peer-urls","{{ etcd.network.proto.peers }}://0.0.0.0:{{ etcd.network.ports.peers }}",
-        "-initial-advertise-peer-urls","{{ etcd.network.proto.peers }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}",
+        "-listen-peer-urls","{{ etcd_network_proto_peers }}://0.0.0.0:{{ etcd_network_ports_peers }}",
+        "-initial-advertise-peer-urls","{{ etcd_network_proto_peers }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}:{{ etcd_network_ports_peers }}",
         "--peer-client-cert-auth",
-        "--peer-key-file","{{ etcd.data.ssl.internal }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key",
-        "--peer-cert-file","{{ etcd.data.ssl.internal }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.pem",
-        "--peer-trusted-ca-file","{{ etcd.data.ssl.internal }}/ca/{{ etcd.data.ssl.ca.cert }}",
+        "--peer-key-file","{{ etcd_data_ssl_internal }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key",
+        "--peer-cert-file","{{ etcd_data_ssl_internal }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.pem",
+        "--peer-trusted-ca-file","{{ etcd_data_ssl_internal }}/ca/{{ etcd_data_ssl_ca_cert }}",
         "--debug"
     ]

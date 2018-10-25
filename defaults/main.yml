@@ -8,10 +8,10 @@ etcd_cluster_token: etcd-cluster0
 
 # Networking
 etcd_network_interface: eth1
-etcd_port_listen: 2379
-etcd_port_peers: 2380
-etcd_proto_listen: https
-etcd_proto_peers: https
+etcd_network_ports_listen: 2379
+etcd_network_ports_peers: 2380
+etcd_network_proto_listen: https
+etcd_network_proto_peers: https
 
 # Data
 etcd_data_dir_external: /data/dockershared/etcd/data
@@ -26,8 +26,8 @@ etcd_data_ssl_transport_cert: client-transport.pem
 etcd_data_ssl_dir: /data/dockershared/etcd/ssl
 
 # Versions
-etcd_repo: quay.io/coreos/etcd
-etcd_tag: v2.3.8
+etcd_image_repo: quay.io/coreos/etcd
+etcd_image_tag: v2.3.8
 
 
 etcd:

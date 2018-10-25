@@ -50,7 +50,7 @@
 - name: Copy generated CA files
   copy: 
     src: "{{ item }}"
-    dest: "{{ etcd.data.ssl.dir }}/ca"
+    dest: "{{ etcd_data_ssl_dir }}/ca"
   with_items:
     - certificates/etcd/ca.pem
     - certificates/etcd/ca.key
