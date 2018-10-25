@@ -1,0 +1,39 @@
+---
+
+- name: Generate peer certificate private key
+  openssl_privatekey:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key"
+  tags:
+    - certificates
+    - client
+
+- name: Generate peer certificate CSR
+  openssl_csr:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.csr"
+    privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.key"
+    common_name: "{{ ansible_hostname }}"
+    subject_alt_name:
+      - "IP:{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}"
+      - "DNS:{{ ansible_hostname }}"
+    basic_constraints:
+      - CA:false
+    basic_constraints_critical: true
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    force: false
+  tags:
+    - certificates
+    - client
+
+- name: Generate peer certificate
+  openssl_certificate:
+    path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.pem"
+    csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/{{ ansible_hostname }}-peer-client.csr"
+    ownca_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.cert }}"
+    ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.key }}"
+    provider: ownca
+    force: false
+  tags:
+    - certificates
+    - client

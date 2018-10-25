@@ -1,0 +1,53 @@
+---
+
+- name: Generate client transport certificate private key
+  become: false
+  local_action:
+    module: openssl_privatekey
+    path: certificates/etcd/client-transport.key
+  tags:
+    - certificates
+    - transport
+
+- name: Generate client certificate CSR
+  become: false
+  local_action:
+    module: openssl_csr
+    path: certificates/etcd/client-transport.csr
+    privatekey_path: certificates/etcd/client-transport.key
+    common_name: "{{ etcd.cluster.name }}"
+    #subject_alt_name: "{{ groups[etcd.hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
+    subject_alt_name: "{% for node in groups[etcd.hosts_group] %}IP:{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}"
+    basic_constraints:
+      - CA:false
+    basic_constraints_critical: true
+    force: false
+  tags:
+    - certificates
+    - transport
+
+- name: Generate peer certificate
+  become: false
+  local_action:
+    module: openssl_certificate
+    path: certificates/etcd/client-transport.pem
+    csr_path: certificates/etcd/client-transport.csr
+    ownca_path: certificates/etcd/ca.pem
+    ownca_privatekey_path: certificates/etcd/ca.key
+    provider: ownca
+    force: false
+  tags:
+    - certificates
+    - transport
+
+- name: Copy generated peer certificate files
+  copy: 
+    src: "{{ item }}"
+    dest: "{{ etcd.data.ssl.dir }}/transport"
+  with_items:
+    - certificates/etcd/client-transport.pem
+    - certificates/etcd/client-transport.key
+  tags:
+    - certificates
+    - ca
+  

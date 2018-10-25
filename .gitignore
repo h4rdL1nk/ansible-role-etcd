@@ -1,5 +1,5 @@
 .molecule
-certificates
+molecule/*/certificates
 .vagrant
 *.pyc
 *.retry
