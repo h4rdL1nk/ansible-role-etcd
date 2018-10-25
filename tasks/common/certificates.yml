@@ -22,7 +22,11 @@
   local_action:
     module: openssl_privatekey
     path: certificates/etcd/ca.key
+  tags:
+    - certificates
+    - ca
 
+## Key usage, as defined in RFC-3280 ( http://www.ietf.org/rfc/rfc3280.txt ), 4.2.1.3 section
 - name: Generate CA CSR
   become: false
   local_action:
@@ -31,12 +35,26 @@
     path: certificates/etcd/ca.csr
     privatekey_path: certificates/etcd/ca.key
     common_name: Ansible
-    country_name: ES
-    state_or_province_name: Madrid
-    locality_name: Madrid
-    email_address: test@somedomain.com
-    organization_name: Organization
-    organizational_unit_name: IT
+    #country_name: ES
+    #state_or_province_name: Madrid
+    #locality_name: Madrid
+    #email_address: test@somedomain.com
+    #organization_name: Organization
+    #organizational_unit_name: IT
+    basic_constraints:
+      - CA:true
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+      - cRLSign
+    key_usage_critical: true
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    force: true
+  tags:
+    - certificates
+    - ca
 
 - name: Generate a Self Signed CA certificate
   become: false
@@ -47,6 +65,10 @@
     privatekey_path: certificates/etcd/ca.key
     csr_path: "certificates/etcd/ca.csr"
     provider: selfsigned
+    force: true
+  tags:
+    - certificates
+    - ca
 
 - name: Copy generated CA files
   copy: 
@@ -55,21 +77,44 @@
   with_items:
     - certificates/etcd/ca.pem
     - certificates/etcd/ca.key
+  tags:
+    - certificates
+    - ca
 
-- name: Generate an OpenSSL private key
+- name: Generate CLIENT private key
   openssl_privatekey:
     path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
+  tags:
+    - certificates
+    - client
 
-- name: Generate an OpenSSL CSR
+- name: Generate CLIENT certificate CSR
   openssl_csr:
     path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
     privatekey_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/privkey.pem"
     common_name: "{{ ansible_hostname }}"
+    subject_alt_name:
+      - "IP:{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}"
+      - "DNS:{{ ansible_hostname }}"
+    basic_constraints:
+      - CA:false
+    basic_constraints_critical: true
+    extended_key_usage:
+      - clientAuth
+      - serverAuth
+    force: true
+  tags:
+    - certificates
+    - client
 
-- name: Generate an OpenSSL certificate signed with your own CA certificate
+- name: Generate CLIENT certificate
   openssl_certificate:
     path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/fullchain.pem"
     csr_path: "{{ etcd.data.ssl.dir }}/{{ ansible_hostname }}/cert.csr"
-    ownca_path: "{{ etcd.data.ssl.dir }}/ca/ca.pem"
-    ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/privkey.pem"
+    ownca_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.cert }}"
+    ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.key }}"
     provider: ownca
+    force: true
+  tags:
+    - certificates
+    - client

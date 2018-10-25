@@ -12,13 +12,20 @@
       - "{{ etcd.network.ports.listen }}:{{ etcd.network.ports.listen }}" 
     volumes:
       - "{{ etcd.data.dir.external }}:{{ etcd.data.dir.internal }}:rw,Z"
+      - "{{ etcd.data.ssl.dir }}:{{ etcd.data.ssl.internal }}:ro,Z"
     command: [
         "--name", "{{ ansible_hostname }}",
         "--data-dir","/datadir",
-        "-advertise-client-urls","http://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.listen }}",
-        "-listen-client-urls","http://0.0.0.0:{{ etcd.network.ports.listen }}",
-        "-initial-advertise-peer-urls","http://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}",
-        "-listen-peer-urls","http://0.0.0.0:{{ etcd.network.ports.peers }}",
+        "-advertise-client-urls","{{ etcd.network.proto.listen }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.listen }}",
+        "-listen-client-urls","{{ etcd.network.proto.listen }}://0.0.0.0:{{ etcd.network.ports.listen }}", 
         "-initial-cluster-token","{{ etcd.cluster.name }}",
-        "-initial-cluster","{% for node in groups[etcd.hosts_group] %}{{ node }}=http://{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}"
+        "-initial-cluster","{% for node in groups[etcd.hosts_group] %}{{ node }}={{ etcd.network.proto.peers }}://{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}",
+        ##Peer listen options
+        "-listen-peer-urls","{{ etcd.network.proto.peers }}://0.0.0.0:{{ etcd.network.ports.peers }}",
+        "-initial-advertise-peer-urls","{{ etcd.network.proto.peers }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.peers }}",
+        "--peer-client-cert-auth",
+        "--peer-key-file","{{ etcd.data.ssl.internal }}/{{ ansible_hostname }}/privkey.pem",
+        "--peer-cert-file","{{ etcd.data.ssl.internal }}/{{ ansible_hostname }}/fullchain.pem",
+        "--peer-trusted-ca-file","{{ etcd.data.ssl.internal }}/ca/{{ etcd.data.ssl.ca.cert }}",
+        "--debug"
     ]
