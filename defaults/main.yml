@@ -1,23 +1,34 @@
 ---
+# Role configuration options
 
+# Cluster
 etcd_hosts_group: etcd-cluster
+etcd_cluster_name: etcd0
+etcd_cluster_token: etcd-cluster0
+
+# Networking
 etcd_network_interface: eth1
 etcd_port_listen: 2379
 etcd_port_peers: 2380
 etcd_proto_listen: https
 etcd_proto_peers: https
-etcd_cluster_name: etcd0
-etcd_cluster_token: etcd-cluster0
+
+# Data
 etcd_data_dir_external: /data/dockershared/etcd/data
 etcd_data_dir_internal: /datadir
+
+# Security
 etcd_data_ssl_internal: /ssl
 etcd_data_ssl_ca_key: ca.key
 etcd_data_ssl_ca_cert: ca.pem
 etcd_data_ssl_transport_key: client-transport.key
 etcd_data_ssl_transport_cert: client-transport.pem
 etcd_data_ssl_dir: /data/dockershared/etcd/ssl
+
+# Versions
 etcd_repo: quay.io/coreos/etcd
 etcd_tag: v2.3.8
+
 
 etcd:
   hosts_group: etcd-cluster
