@@ -130,7 +130,8 @@
     path: certificates/etcd/client-transport.csr
     privatekey_path: certificates/etcd/client-transport.key
     common_name: "{{ etcd.cluster.name }}"
-    subject_alt_name: "{{ groups[etcd.hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
+    #subject_alt_name: "{{ groups[etcd.hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
+    subject_alt_name: "{% for node in groups[etcd.hosts_group] %}IP:{{ hostvars[node]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}{% if loop.index < groups[etcd.hosts_group]|length %},{% endif %}{% endfor %}"
     basic_constraints:
       - CA:false
     basic_constraints_critical: true

@@ -17,10 +17,10 @@
         "--name", "{{ ansible_hostname }}",
         "--data-dir","/datadir",
         ##Client listen options
-        #"--client-cert-auth",
+        "--client-cert-auth",
         "--trusted-ca-file","{{ etcd.data.ssl.internal }}/ca/{{ etcd.data.ssl.ca.cert }}",
         "--cert-file","{{ etcd.data.ssl.internal }}/transport/{{ etcd.data.ssl.transport.cert }}", 
-        "--key-file","{{ etcd.data.ssl.internal }}/transport/{{ etcd.data.ssl.transport.cert }}",
+        "--key-file","{{ etcd.data.ssl.internal }}/transport/{{ etcd.data.ssl.transport.key }}",
         "-advertise-client-urls","{{ etcd.network.proto.listen }}://{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd.network.interface)].ipv4.address }}:{{ etcd.network.ports.listen }}",
         "-listen-client-urls","{{ etcd.network.proto.listen }}://0.0.0.0:{{ etcd.network.ports.listen }}", 
         "-initial-cluster-token","{{ etcd.cluster.name }}",
