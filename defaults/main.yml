@@ -28,35 +28,3 @@ etcd_data_ssl_dir: /data/dockershared/etcd/ssl
 # Versions
 etcd_image_repo: quay.io/coreos/etcd
 etcd_image_tag: v2.3.8
-
-
-etcd:
-  hosts_group: etcd-cluster
-  network:
-    interface: eth1
-    ports:
-      listen: 2379
-      peers: 2380
-    proto:
-      listen: https
-      peers: https
-  cluster:
-    name: etcd0
-    token: etcd-cluster0
-  data:
-    dir: 
-      external: /data/dockershared/etcd/data
-      internal: /datadir
-    ssl:
-      internal: /ssl
-      ca:
-        key: ca.key
-        cert: ca.pem
-        issuer: Custom Issuer
-      transport:
-        key: client-transport.key
-        cert: client-transport.pem
-      dir: /data/dockershared/etcd/ssl
-  image:
-    repo: quay.io/coreos/etcd
-    tag: v2.3.8
