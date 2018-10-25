@@ -35,12 +35,6 @@
     path: certificates/etcd/ca.csr
     privatekey_path: certificates/etcd/ca.key
     common_name: Ansible
-    #country_name: ES
-    #state_or_province_name: Madrid
-    #locality_name: Madrid
-    #email_address: test@somedomain.com
-    #organization_name: Organization
-    #organizational_unit_name: IT
     basic_constraints:
       - CA:true
     basic_constraints_critical: true
@@ -51,7 +45,7 @@
     extended_key_usage:
       - clientAuth
       - serverAuth
-    force: true
+    force: false
   tags:
     - certificates
     - ca
@@ -65,7 +59,7 @@
     privatekey_path: certificates/etcd/ca.key
     csr_path: "certificates/etcd/ca.csr"
     provider: selfsigned
-    force: true
+    force: false
   tags:
     - certificates
     - ca
@@ -102,7 +96,7 @@
     extended_key_usage:
       - clientAuth
       - serverAuth
-    force: true
+    force: false
   tags:
     - certificates
     - client
@@ -114,7 +108,7 @@
     ownca_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.cert }}"
     ownca_privatekey_path: "{{ etcd.data.ssl.dir }}/ca/{{ etcd.data.ssl.ca.key }}"
     provider: ownca
-    force: true
+    force: false
   tags:
     - certificates
     - client
