@@ -31,7 +31,7 @@ etcd_data_ssl_ca_key: ca.key
 etcd_data_ssl_ca_csr: ca.csr
 etcd_data_ssl_ca_cert: ca.pem
 etcd_data_ssl_ca_cn: Ansible
-etcd_data_ssl_ca_expiry: 10
+etcd_data_ssl_ca_expiry: 50
 etcd_data_ssl_transport_dir: transport
 etcd_data_ssl_transport_key: client-transport.key
 etcd_data_ssl_transport_csr: client-transport.csr

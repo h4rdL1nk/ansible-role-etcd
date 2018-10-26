@@ -41,8 +41,7 @@
     path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_cert }}"
     privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
     csr_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_csr }}"
-    not_before: "${lookup('pipe','date +%Y%m%d%H0000Z')}"
-    not_after: "${lookup('pipe','date --date +20year +%Y%m%d%H0000Z')}"
+    valid_at: "{{lookup('pipe','date --date +%dyear +%%Y%%m%%d%%H0000Z'|format(etcd_data_ssl_ca_expiry))}}"
     provider: selfsigned
     force: false
   tags:
