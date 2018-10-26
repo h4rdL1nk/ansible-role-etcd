@@ -4,7 +4,7 @@
   become: false
   local_action:
     module: openssl_privatekey
-    path: certificates/etcd/client-transport.key
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_key }}"
   tags:
     - certificates
     - transport
@@ -13,8 +13,8 @@
   become: false
   local_action:
     module: openssl_csr
-    path: certificates/etcd/client-transport.csr
-    privatekey_path: certificates/etcd/client-transport.key
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_csr }}"
+    privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_key }}"
     common_name: "{{ etcd_cluster_name }}"
     #subject_alt_name: "{{ groups[etcd_hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
     subject_alt_name: "{% for node in groups[etcd_hosts_group] %}IP:{{ hostvars[node]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}{% if loop.index < groups[etcd_hosts_group]|length %},{% endif %}{% endfor %}"
@@ -30,10 +30,10 @@
   become: false
   local_action:
     module: openssl_certificate
-    path: certificates/etcd/client-transport.pem
-    csr_path: certificates/etcd/client-transport.csr
-    ownca_path: certificates/etcd/ca.pem
-    ownca_privatekey_path: certificates/etcd/ca.key
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_cert }}"
+    csr_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_csr }}"
+    ownca_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_cert }}"
+    ownca_privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
     provider: ownca
     force: false
   tags:
@@ -43,10 +43,10 @@
 - name: Copy generated peer certificate files
   copy: 
     src: "{{ item }}"
-    dest: "{{ etcd_data_ssl_dir }}/transport"
+    dest: "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_transport_dir }}"
   with_items:
-    - certificates/etcd/client-transport.pem
-    - certificates/etcd/client-transport.key
+    - "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_cert }}"
+    - "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_key }}"
   tags:
     - certificates
     - ca

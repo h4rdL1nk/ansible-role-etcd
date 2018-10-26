@@ -4,7 +4,7 @@
   become: false
   local_action:
     module: openssl_privatekey
-    path: certificates/etcd/ca.key
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
   tags:
     - certificates
     - ca
@@ -15,8 +15,8 @@
   local_action:
     module: openssl_csr
     state: present
-    path: certificates/etcd/ca.csr
-    privatekey_path: certificates/etcd/ca.key
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_csr }}"
+    privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
     common_name: Ansible
     basic_constraints:
       - CA:true
@@ -38,9 +38,9 @@
   local_action:
     module: openssl_certificate
     state: present
-    path: certificates/etcd/ca.pem
-    privatekey_path: certificates/etcd/ca.key
-    csr_path: "certificates/etcd/ca.csr"
+    path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_cert }}"
+    privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
+    csr_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_csr }}"
     provider: selfsigned
     force: false
   tags:
@@ -50,10 +50,10 @@
 - name: Copy generated CA files
   copy: 
     src: "{{ item }}"
-    dest: "{{ etcd_data_ssl_dir }}/ca"
+    dest: "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_ca_dir }}"
   with_items:
-    - certificates/etcd/ca.pem
-    - certificates/etcd/ca.key
+    - "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_cert }}"
+    - "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
   tags:
     - certificates
     - ca

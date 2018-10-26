@@ -6,9 +6,9 @@
     state: directory
   with_items:
     - "{{ etcd_data_ssl_dir }}"
-    - "{{ etcd_data_ssl_dir }}/ca"
-    - "{{ etcd_data_ssl_dir }}/transport"
-    - "{{ etcd_data_ssl_dir }}/{{ ansible_hostname }}"
+    - "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_ca_dir }}"
+    - "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_transport_dir }}"
+    - "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_peer_dir }}"
 
 - name: Create local certificates directory
   become: false
