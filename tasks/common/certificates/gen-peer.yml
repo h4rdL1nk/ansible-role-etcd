@@ -11,10 +11,10 @@
   openssl_csr:
     path: "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_peer_dir }}/{{ etcd_data_ssl_peer_csr }}"
     privatekey_path: "{{ etcd_data_ssl_dir }}/{{ etcd_data_ssl_peer_dir }}/{{ etcd_data_ssl_peer_key }}"
-    common_name: "{{ ansible_hostname }}"
+    common_name: "{{ etcd_data_ssl_peer_cn|default( ansible_hostname ) }}"
     subject_alt_name:
       - "IP:{{ hostvars[inventory_hostname]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}"
-      - "DNS:{{ ansible_hostname }}"
+      - "DNS:{{ etcd_data_ssl_peer_cn|default( ansible_hostname ) }}"
     basic_constraints:
       - CA:false
     basic_constraints_critical: true

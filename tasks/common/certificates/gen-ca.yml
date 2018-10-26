@@ -17,7 +17,7 @@
     state: present
     path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_csr }}"
     privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_ca_key }}"
-    common_name: Ansible
+    common_name: "{{ etcd_data_ssl_ca_cn }}"
     basic_constraints:
       - CA:true
     basic_constraints_critical: true

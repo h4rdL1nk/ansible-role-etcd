@@ -30,14 +30,17 @@ etcd_data_ssl_ca_dir: ca
 etcd_data_ssl_ca_key: ca.key
 etcd_data_ssl_ca_csr: ca.csr
 etcd_data_ssl_ca_cert: ca.pem
+etcd_data_ssl_ca_cn: Ansible
 etcd_data_ssl_transport_dir: transport
 etcd_data_ssl_transport_key: client-transport.key
 etcd_data_ssl_transport_csr: client-transport.csr
 etcd_data_ssl_transport_cert: client-transport.pem
+etcd_data_ssl_transport_cn: "{{ etcd_cluster_name }}"
 etcd_data_ssl_peer_dir: peer
 etcd_data_ssl_peer_key: peer.key
 etcd_data_ssl_peer_csr: peer.csr
 etcd_data_ssl_peer_cert: peer.pem
+etcd_data_ssl_peer_cn: "{{ ansible_hostname }}"
 
 # Versions
 etcd_image_repo: quay.io/coreos/etcd

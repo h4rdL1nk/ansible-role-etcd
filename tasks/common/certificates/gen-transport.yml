@@ -15,7 +15,7 @@
     module: openssl_csr
     path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_csr }}"
     privatekey_path: "{{ etcd_ssl_local_dir }}/{{ etcd_data_ssl_transport_key }}"
-    common_name: "{{ etcd_cluster_name }}"
+    common_name: "{{ etcd_data_ssl_transport_cn }}"
     #subject_alt_name: "{{ groups[etcd_hosts_group] | map('regex_replace', '^', 'DNS:') | list }}"
     subject_alt_name: "{% for node in groups[etcd_hosts_group] %}IP:{{ hostvars[node]['ansible_%s' | format(etcd_network_interface)].ipv4.address }}{% if loop.index < groups[etcd_hosts_group]|length %},{% endif %}{% endfor %}"
     basic_constraints:
