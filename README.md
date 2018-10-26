@@ -1,4 +1,4 @@
-# Ansible role for Docker CE installation ( molecule driven tests )
+# Ansible role for docker-based etcd cluster deployment ( molecule driven tests )
 
 This role installs and configure docker community-edition with devicemapper storage driver.
 
