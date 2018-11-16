@@ -1,0 +1,27 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: openstack
+lint:
+  name: yamllint
+platforms:
+  - name: instance
+    image: Ubuntu-16.04
+    flavor: NO-Nano
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    prepare: ../../molecule_common/scenarios/openstack/prepare.yml 
+    create: ../../molecule_common/scenarios/openstack/create.yml
+    converge: playbook.yml
+    destroy: ../../molecule_common/scenarios/openstack/destroy.yml
+
+scenario:
+  name: openstack
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
