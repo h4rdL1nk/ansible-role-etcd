@@ -6,9 +6,22 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: instance
-    image: Ubuntu-16.04
-    flavor: NO-Nano
+  - name: ${JOB_NAME:-molecule_instance_manual}
+    image: TID-RH75.20180601
+    flavor: TID-01CPU-01GB-20GB 
+    sshuser: cloud-user
+    ip_pool: ext_mgmt
+    network: DOCKER_MGMT
+    networks:
+      - net-name: DOCKER_MGMT
+      - net-name: DOCKER_BACK
+    volumes:
+      - name: ${JOB_NAME:-molecule_instance_manual}_volume_1
+        size: 5
+        device: /dev/vdb
+      - name: ${JOB_NAME:-molecule_instance_manual}_volume_1
+        size: 10
+        device: /dev/vdb
 provisioner:
   name: ansible
   lint:
